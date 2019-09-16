@@ -1,0 +1,105 @@
+version: '2'
+services:
+  judger:
+    image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/judge_server
+    container_name: shuoj_judger
+    read_only: true
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+      - FSETID
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./backend/upload/problems:/test_case:ro
+      - ./judger/log:/log
+      # - $PWD/server:/code:ro
+      - ./judger/run:/judger
+    environment:
+      - BACKEND_URL=http://192.168.3.225:8081/api/v1/judge_server_heartbeat
+      - SERVICE_URL=http://192.168.3.225:12358
+      - TOKEN=acmOJ_shu
+    ports:
+      - '0.0.0.0:12358:8080'
+
+  mysql:
+    image: mysql:5
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: passmysql
+    ports:
+      - '3306:3306'
+    volumes:
+      - './mysql/db:/var/lib/mysql'
+      - './mysql/conf:/etc/mysql/conf.d'
+      - './init/mysql:/docker-entrypoint-initdb.d'
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - './redis/data:/data'
+
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - '2181:2181'
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka:2.12-2.2.0
+    ports:
+      - '9092:9092'
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.3.225
+      KAFKA_CREATE_TOPICS: 'submission:1:1,auth:1:1'
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  backend:
+    image: registry.cn-hangzhou.aliyuncs.com/kastnerorz/shu-online-judge:v1.0-rc2
+    container_name: shuoj_backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/oj?characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=passmysql
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=30MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=100MB
+      # - SERVER_PORT=8081
+      - UPLOAD_PATH=/var/lib/upload
+      - KAFKA_PRODUCER_BOOTSTRAPSERVERS=KAFKA_ADVERTISED_HOST_NAME:9092
+      - KAFKA_CONSUMER_BOOTSTRAPSERVERS=KAFKA_ADVERTISED_HOST_NAME:9092
+      - KAFKA_TOPIC_SUBMISSION=submission
+      - KAFKA_TOPIC_AUTH=auth
+      - SPRING_REDIS_HOST=redis
+      - JWT_SECRET=acmOJ_shu
+      - JUDGE-SERVER_TOKEN=50f155d68905eb9fc33a23dd821204167eba0fdaf8197abbf75f8edf60ccae98
+    ports:
+      - 8081:8081
+    volumes:
+      - ./backend/upload:/var/lib/upload
+    depends_on:
+      - redis
+      - mysql
+      - kafka
+      - zookeeper
+
+  frontend:
+    build:
+      context: .
+      args:
+        - VUE_APP_BASE_URL=http://192.168.3.225:8081
+    environment:
+      - PORT=8080
+    container_name: shuoj_frontend
+    ports:
+      - '8080:8080'
