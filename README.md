@@ -18,6 +18,6 @@
 ## Script
 
 ```bash
-chmod +X deploy.sh
+chmod +x deploy.sh
 ./deploy.sh
 ```
