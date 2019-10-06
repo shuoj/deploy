@@ -59,7 +59,7 @@ services:
     ports:
       - '2181:2181'
     networks:
-      - webnet
+      - kafkanet
 
   kafka:
     container_name: kafka
@@ -67,13 +67,13 @@ services:
     ports:
       - '9092:9092'
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_HOST_NAME: ${LOCAL_HOST}
       KAFKA_CREATE_TOPICS: 'submission:1:1,auth:1:1'
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - webnet
+      - kafkanet
 
   backend:
     image: registry.cn-hangzhou.aliyuncs.com/kastnerorz/shu-online-judge:v1.0-rc2
@@ -86,8 +86,8 @@ services:
       - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=100MB
       # - SERVER_PORT=8081
       - UPLOAD_PATH=/var/lib/upload
-      - KAFKA_PRODUCER_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CONSUMER_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_PRODUCER_BOOTSTRAPSERVERS=${LOCAL_HOST}:9092
+      - KAFKA_CONSUMER_BOOTSTRAPSERVERS=${LOCAL_HOST}:9092
       - KAFKA_TOPIC_SUBMISSION=submission
       - KAFKA_TOPIC_AUTH=auth
       - SPRING_REDIS_HOST=redis
@@ -108,7 +108,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./shu-online-judge-fe
       args:
         - VUE_APP_BASE_URL=http://192.168.3.225:8081
     environment:
@@ -120,3 +120,4 @@ services:
       - webnet
 networks:
   webnet:
+  kafkanet:
