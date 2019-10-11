@@ -110,7 +110,7 @@ services:
     build:
       context: ./shu-online-judge-fe
       args:
-        - VUE_APP_BASE_URL=http://192.168.3.225:8081
+        - VUE_APP_BASE_URL=http://${LOCAL_HOST}:8081
     environment:
       - PORT=8080
     container_name: shuoj_frontend
