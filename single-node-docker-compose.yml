@@ -2,7 +2,7 @@ version: '3'
 services:
   judger:
     image: registry.cn-hangzhou.aliyuncs.com/onlinejudge/judge_server
-    container_name: shuoj_judger
+    container_name: shuoj-judger
     read_only: true
     cap_drop:
       - SETPCAP
@@ -19,8 +19,8 @@ services:
       # - $PWD/server:/code:ro
       - ./judger/run:/judger
     environment:
-      - BACKEND_URL=http://backend:8081/api/v1/judge_server_heartbeat
-      - SERVICE_URL=http://judger:8080
+      - BACKEND_URL=http://shuoj-backend:8081/api/v1/judge_server_heartbeat
+      - SERVICE_URL=http://shuoj-judger:8080
       - TOKEN=acmOJ_shu
     ports:
       - '0.0.0.0:12358:8080'
@@ -78,7 +78,7 @@ services:
 
   backend:
     image: registry.cn-hangzhou.aliyuncs.com/kastnerorz/shu-online-judge:v1.0-rc2
-    container_name: shuoj_backend
+    container_name: shuoj-backend
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/oj?characterEncoding=utf8&serverTimezone=UTC&useSSL=false
       - SPRING_DATASOURCE_USERNAME=root
@@ -94,7 +94,8 @@ services:
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET=acmOJ_shu
-      - JUDGE-SERVER_TOKEN=50f155d68905eb9fc33a23dd821204167eba0fdaf8197abbf75f8edf60ccae98
+      - JUDGER_TOKEN=50f155d68905eb9fc33a23dd821204167eba0fdaf8197abbf75f8edf60ccae98
+      - JUDGER_URL=http://shuoj-judger:12358
     ports:
       - 8081:8081
     volumes:
@@ -114,7 +115,7 @@ services:
         - VUE_APP_BASE_URL=http://${LOCAL_HOST}:8081
     environment:
       - PORT=8080
-    container_name: shuoj_frontend
+    container_name: shuoj-frontend
     ports:
       - '8080:8080'
     networks:
