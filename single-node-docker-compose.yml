@@ -95,7 +95,7 @@ services:
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET=acmOJ_shu
       - JUDGER_TOKEN=50f155d68905eb9fc33a23dd821204167eba0fdaf8197abbf75f8edf60ccae98
-      - JUDGER_URL=http://shuoj-judger:12358
+      - JUDGER_URL=http://shuoj-judger:8080
     ports:
       - 8081:8081
     volumes:
