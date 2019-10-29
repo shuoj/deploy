@@ -77,7 +77,7 @@ services:
       - kafkanet
 
   backend:
-    image: registry.cn-hangzhou.aliyuncs.com/kastnerorz/shu-online-judge:v1.0-rc2
+    image: registry.cn-hangzhou.aliyuncs.com/kastnerorz/shu-online-judge:v1.1.0
     container_name: shuoj-backend
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/oj?characterEncoding=utf8&serverTimezone=UTC&useSSL=false
