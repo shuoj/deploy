@@ -60,4 +60,4 @@ create table user
 )
   engine = MyISAM;
 
-INSERT INTO user (id, ac_count, ac_rate, email, enabled, firstname, last_password_reset_date, lastname, name, password, refer_user_id, school, signature, student_number, submit_count, temporary, username) VALUES ('6b2eec89-f8fe-431a-b026-8ee844329ff0', 0, 0, 'logoutuser@shu.edu.cn', true, '已注销', '2019-10-28 13:53:52', '用户', '用户已注销', '$2a$10$bSHGZ.xb65cC5zpolRxFQ.PmtZ1.x87ZxBOa820pPhtYf.zzGANme', null, '上海大学111', null, null, 0, null, 'logoutuser');
+INSERT INTO user (id, ac_count, ac_rate, email, enabled, firstname, last_password_reset_date, lastname, name, password, refer_user_id, school, signature, student_number, submit_count, temporary, username) VALUES ('6b2eec89-f8fe-431a-b026-8ee844329ff0', 0, 0, 'logoutuser@shu.edu.cn', true, '已注销', '2019-10-28 13:53:52', '用户', '用户已注销', '$2a$10$bSHGZ.xb65cC5zpolRxFQ.PmtZ1.x87ZxBOa820pPhtYf.zzGANme', null, '上海大学', null, null, 0, null, 'logoutuser');
